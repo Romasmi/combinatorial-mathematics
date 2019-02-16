@@ -1,6 +1,12 @@
 #include "pch.h"
 using namespace std;
 
+void Print(const vector<int>& v, const unsigned int offset = 0)
+{
+	copy(v.begin() + offset, v.end(), ostream_iterator<int>(cout, ""));
+	cout << '\n';
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc != 3)
@@ -26,8 +32,7 @@ int main(int argc, char* argv[])
 	time.restart();
 	while (m != 0)
 	{
-		//copy(combination.begin() + 1, combination.end(), ostream_iterator<int>(cout, ""));
-		//cout << '\n';
+		//Print(combination, 1);
 		m = k;
 		while (combination[m] == n - k + m)
 			--m;

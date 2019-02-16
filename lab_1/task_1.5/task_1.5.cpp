@@ -1,7 +1,7 @@
 #include "pch.h"
 using namespace std;
 
-void Print(const vector<int> v, unsigned int offset = 0)
+void Print(const vector<int>& v, const unsigned int offset = 0)
 {
 	copy(v.begin() + offset, v.end(), ostream_iterator<int>(cout, ""));
 	cout << '\n';
