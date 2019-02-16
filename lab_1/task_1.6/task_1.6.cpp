@@ -1,7 +1,7 @@
 #include "pch.h"
 using namespace std;
 
-void PrintBySet(const vector<int>& set, size_t endOffset)
+void PrintBySet(const vector<int>& set, const size_t endOffset)
 {
 	bool printed = false;
 	for (size_t i = 0; i < set.size() - endOffset; ++i)
