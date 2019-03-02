@@ -80,7 +80,7 @@ bool ParseStream(Params& params, istream& input)
 Backpack GetCombination(const vector<int>& set, const Backpack& backpack)
 {
 	vector<Cargo> combination;
-	for (size_t i = 0; i < backpack.size() - 1; ++i)
+	for (size_t i = 0; i < backpack.size(); ++i)
 	{
 		if (set[i] == 1)
 		{
