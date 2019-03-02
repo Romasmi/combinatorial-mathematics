@@ -2,7 +2,6 @@
 #define PCH_H
 
 #include <algorithm>
-#include <boost/timer.hpp>
 #include <fstream>
 #include <iostream>
 #include <iterator>
@@ -12,10 +11,6 @@
 #include <tchar.h>
 #include <utility>
 #include <vector>
-#include <fstream>
-#include <sstream>
-#include <iomanip>
-#include <algorithm>
 
 #endif
 
