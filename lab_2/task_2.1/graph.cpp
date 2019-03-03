@@ -47,12 +47,6 @@ void Graph::Load(istream& in)
 	{
 		//throw "Invalid edges count";
 	}
-
-	this->PrintPoints();
-	cout << "BFS\n";
-	this->BFS();
-	cout << "DFS\n";
-	this->DFS();
 }
 
 void Graph::PrintPoints()
@@ -93,8 +87,10 @@ void Graph::BFS()
 void Graph::DFS()
 {
 	AdjacentyStruct points = this->points;
+	size_t time = 1;
 	stack<size_t> stack;
 	stack.push(this->rootPointNumber);
+	points[this->rootPointNumber].inTime.value = time;
 	while (!stack.empty())
 	{
 		size_t pointNumber = stack.top();
@@ -103,15 +99,21 @@ void Graph::DFS()
 		{
 			continue;
 		}
+		points[pointNumber].outTime.value = ++time;
 		points[pointNumber].color = Color::BLACK;
 		for (size_t pointNumber : points[pointNumber].adjacentPoints)
 		{
 			if (points[pointNumber].color != Color::BLACK)
 			{
 				stack.push(pointNumber);
-				points[pointNumber].color = Color::GREY;
+				if (points[pointNumber].color != Color::GREY)
+				{
+					points[pointNumber].inTime.value = ++time;
+					points[pointNumber].color = Color::GREY;
+				}
 			}
 		}
-		cout << pointNumber << '\n';
+		cout << pointNumber << " [" << points[pointNumber].inTime.value << ':' << points[pointNumber].outTime.value << "]\n";
+		//cout << pointNumber << '\n';
 	}
 }

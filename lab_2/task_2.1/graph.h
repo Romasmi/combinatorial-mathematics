@@ -20,8 +20,8 @@ using AdjacentPoints = std::vector<size_t>;
 
 struct PointWithAdjacentPoints
 {
-	PointNumber inNumber;
-	PointNumber outNumber;
+	PointNumber inTime;
+	PointNumber outTime;
 	Color color = WHITE;
 	AdjacentPoints adjacentPoints;
 };
