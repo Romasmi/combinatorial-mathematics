@@ -4,9 +4,9 @@
 #include "vector_processor.h"
 
 #include <fstream>
-#include <string>
 #include <queue>
 #include <stack>
+#include <string>
 
 using namespace std;
 
@@ -49,10 +49,13 @@ void Graph::Load(istream& in)
 	}
 
 	this->PrintPoints();
+	cout << "BFS\n";
 	this->BFS();
+	cout << "DFS\n";
+	this->DFS();
 }
 
-void Graph::PrintPoints()	
+void Graph::PrintPoints()
 {
 	for (size_t i = 0; i < points.size(); ++i)
 	{
@@ -89,5 +92,25 @@ void Graph::BFS()
 
 void Graph::DFS()
 {
-
+	AdjacentyStruct points = this->points;
+	stack<size_t> stack;
+	stack.push(this->rootPointNumber);
+	while (!stack.empty())
+	{
+		size_t pointNumber = stack.top();
+		stack.pop();
+		if (points[pointNumber].color == Color::BLACK)
+		{
+			continue;
+		}
+		for (size_t pointNumber : points[pointNumber].adjacentPoints)
+		{
+			if (points[pointNumber].color == Color::WHITE)
+			{
+				stack.push(pointNumber);
+				points[pointNumber].color = Color::GREY;
+			}
+		}
+		cout << pointNumber << '\n';
+	}
 }
