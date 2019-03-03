@@ -1,6 +1,15 @@
 #include "pch.h"
+#include "graph.h"
+using namespace std;
 
 int main()
 {
-	std::cout << "Hello World!\n";
+	try
+	{
+		Graph graph(cin);
+	}
+	catch (const exception& e)
+	{
+		cout << e.what() << '\n';
+	}
 }
