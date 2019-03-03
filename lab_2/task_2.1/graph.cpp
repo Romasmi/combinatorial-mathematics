@@ -103,9 +103,10 @@ void Graph::DFS()
 		{
 			continue;
 		}
+		points[pointNumber].color = Color::BLACK;
 		for (size_t pointNumber : points[pointNumber].adjacentPoints)
 		{
-			if (points[pointNumber].color == Color::WHITE)
+			if (points[pointNumber].color != Color::BLACK)
 			{
 				stack.push(pointNumber);
 				points[pointNumber].color = Color::GREY;
