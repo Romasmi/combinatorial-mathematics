@@ -10,18 +10,12 @@ enum Color
 	BLACK
 };
 
-struct PointNumber
-{
-	size_t value;
-	bool isSet = false;
-};
-
 using AdjacentPoints = std::vector<size_t>;
 
 struct PointWithAdjacentPoints
 {
-	PointNumber inTime;
-	PointNumber outTime;
+	size_t inTime;
+	size_t outTime;
 	Color color = WHITE;
 	AdjacentPoints adjacentPoints;
 };
@@ -35,6 +29,8 @@ public:
 	void PrintPoints();
 	void BFS();
 	void DFS();
+	void PrintCutVeticles();
+	static bool IsParent(const PointWithAdjacentPoints& parent, const PointWithAdjacentPoints& child);
 
 private:
 	AdjacentyStruct points;

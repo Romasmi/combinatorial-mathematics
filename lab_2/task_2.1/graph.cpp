@@ -1,6 +1,8 @@
 #include "pch.h"
+
 #include "graph.h"
 #include "string_processor.h"
+#include "util.h"
 #include "vector_processor.h"
 
 #include <fstream>
@@ -54,7 +56,7 @@ void Graph::PrintPoints()
 	for (size_t i = 0; i < points.size(); ++i)
 	{
 		PointWithAdjacentPoints point = this->points[i];
-		if (point.adjacentPoints.size() != 0)
+		if (!point.adjacentPoints.empty())
 		{
 			cout << i << ": ";
 			Print<size_t>(point.adjacentPoints);
@@ -90,30 +92,134 @@ void Graph::DFS()
 	size_t time = 1;
 	stack<size_t> stack;
 	stack.push(this->rootPointNumber);
-	points[this->rootPointNumber].inTime.value = time;
+	points[this->rootPointNumber].inTime = time;
+	points[this->rootPointNumber].color = Color::GREY;
 	while (!stack.empty())
 	{
 		size_t pointNumber = stack.top();
 		stack.pop();
+
 		if (points[pointNumber].color == Color::BLACK)
 		{
 			continue;
 		}
-		points[pointNumber].outTime.value = ++time;
-		points[pointNumber].color = Color::BLACK;
+
+		if (points[pointNumber].color != Color::GREY)
+		{
+			points[pointNumber].color = Color::GREY;
+			points[pointNumber].inTime = ++time;
+		}
+		stack.push(pointNumber);
+
+		bool hasWhiteAdjacentPoints = false;
 		for (size_t pointNumber : points[pointNumber].adjacentPoints)
 		{
-			if (points[pointNumber].color != Color::BLACK)
+			if (points[pointNumber].color == Color::WHITE)
 			{
 				stack.push(pointNumber);
-				if (points[pointNumber].color != Color::GREY)
-				{
-					points[pointNumber].inTime.value = ++time;
-					points[pointNumber].color = Color::GREY;
-				}
+				hasWhiteAdjacentPoints = true;
 			}
 		}
-		cout << pointNumber << " [" << points[pointNumber].inTime.value << ':' << points[pointNumber].outTime.value << "]\n";
-		//cout << pointNumber << '\n';
+		if (!hasWhiteAdjacentPoints)
+		{
+			stack.pop();
+			points[pointNumber].color = Color::BLACK;
+			points[pointNumber].outTime = ++time;
+			cout << pointNumber << " [" << points[pointNumber].inTime << ':' << points[pointNumber].outTime << "]\n";
+		}
+	}
+}
+
+bool Graph::IsParent(const PointWithAdjacentPoints& parent, const PointWithAdjacentPoints& child)
+{
+	return parent.inTime < child.inTime && parent.outTime > child.outTime;
+}
+
+void Graph::PrintCutVeticles()
+{
+	AdjacentyStruct points = this->points;
+	size_t time = 1;
+	stack<size_t> stack;
+	stack.push(this->rootPointNumber);
+	points[this->rootPointNumber].inTime = time;
+	points[this->rootPointNumber].color = Color::GREY;
+
+	vector<size_t> up(points.size());
+	fill(up.begin(), up.end(), 1);
+	vector<size_t> parent(points.size());
+	size_t rootChildsCount = 0;
+
+	while (!stack.empty())
+	{
+		size_t pointNumber = stack.top();
+		stack.pop();
+
+		if (points[pointNumber].color == Color::WHITE)
+		{
+			points[pointNumber].color = Color::GREY;
+			points[pointNumber].inTime = ++time;
+			up[pointNumber] = points[pointNumber].inTime;
+		}
+		if (points[pointNumber].color != Color::BLACK)
+		{
+			stack.push(pointNumber);
+		}
+
+		bool hasWhiteAdjacentPoints = false;
+		bool upIsSet = false;
+		size_t minUp = this->pointsCount * this->pointsCount;
+		for (size_t adjacentPointNumber : points[pointNumber].adjacentPoints)
+		{
+			if (points[adjacentPointNumber].color == Color::WHITE)
+			{
+				parent[adjacentPointNumber] = pointNumber;
+				stack.push(adjacentPointNumber);
+				hasWhiteAdjacentPoints = true;
+			}
+			else if (parent[pointNumber] != adjacentPointNumber)
+			{
+				if (points[adjacentPointNumber].color != Color::BLACK)
+				{
+					up[pointNumber] = Min<size_t>(up[pointNumber], up[adjacentPointNumber]);
+				}
+				else
+				{
+					upIsSet = true;
+					size_t pointUp = Min<size_t>(up[pointNumber], up[adjacentPointNumber]);
+					if (pointUp >= points[pointNumber].inTime && pointNumber != this->rootPointNumber)
+					{
+						cout << pointNumber << ' ';
+					}
+					if (pointUp < minUp)
+					{
+						minUp = pointUp;
+					}
+				}
+			}
+			int a = 1;
+		}
+		if (upIsSet)
+		{
+			up[pointNumber] = minUp;
+		}
+
+		if (!hasWhiteAdjacentPoints && points[pointNumber].color != Color::BLACK)
+		{
+			stack.pop();
+			points[pointNumber].color = Color::BLACK;
+		}
+	}
+
+	for (size_t pointNumber : points[this->rootPointNumber].adjacentPoints)
+	{
+		if (up[pointNumber] != up[this->rootPointNumber])
+		{
+			++rootChildsCount;
+		}
+		if (rootChildsCount == 2)
+		{
+			cout << this->rootPointNumber;
+			return;
+		}
 	}
 }
