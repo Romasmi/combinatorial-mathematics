@@ -135,91 +135,121 @@ bool Graph::IsParent(const PointWithAdjacentPoints& parent, const PointWithAdjac
 	return parent.inTime < child.inTime && parent.outTime > child.outTime;
 }
 
-void Graph::PrintCutVeticles()
+vector<size_t> Graph::GetCutVerticles()
 {
-	AdjacentyStruct points = this->points;
-	size_t time = 1;
-	stack<size_t> stack;
-	stack.push(this->rootPointNumber);
-	points[this->rootPointNumber].inTime = time;
-	points[this->rootPointNumber].color = Color::GREY;
-
-	vector<size_t> up(points.size());
-	fill(up.begin(), up.end(), 1);
-	vector<size_t> parent(points.size());
-	size_t rootChildsCount = 0;
-
-	while (!stack.empty())
+	if (!this->cutVetirclesFound)
 	{
-		size_t pointNumber = stack.top();
-		stack.pop();
+		AdjacentyStruct points = this->points;
+		size_t time = 1;
+		stack<size_t> stack;
+		stack.push(this->rootPointNumber);
+		points[this->rootPointNumber].inTime = time;
+		points[this->rootPointNumber].color = Color::GREY;
 
-		if (points[pointNumber].color == Color::WHITE)
-		{
-			points[pointNumber].color = Color::GREY;
-			points[pointNumber].inTime = ++time;
-			up[pointNumber] = points[pointNumber].inTime;
-		}
-		if (points[pointNumber].color != Color::BLACK)
-		{
-			stack.push(pointNumber);
-		}
+		vector<bool> cutVeticles(points.size());
+		vector<size_t> up(points.size());
+		fill(up.begin(), up.end(), 1);
+		vector<size_t> parent(points.size());
+		size_t rootChildsCount = 0;
 
-		bool hasWhiteAdjacentPoints = false;
-		bool upIsSet = false;
-		size_t minUp = this->pointsCount * this->pointsCount;
-		for (size_t adjacentPointNumber : points[pointNumber].adjacentPoints)
+		while (!stack.empty())
 		{
-			if (points[adjacentPointNumber].color == Color::WHITE)
-			{
-				parent[adjacentPointNumber] = pointNumber;
-				stack.push(adjacentPointNumber);
-				hasWhiteAdjacentPoints = true;
-			}
-			else if (parent[pointNumber] != adjacentPointNumber)
-			{
-				if (points[adjacentPointNumber].color != Color::BLACK)
-				{
-					up[pointNumber] = Min<size_t>(up[pointNumber], up[adjacentPointNumber]);
-				}
-				else
-				{
-					upIsSet = true;
-					size_t pointUp = Min<size_t>(up[pointNumber], up[adjacentPointNumber]);
-					if (pointUp >= points[pointNumber].inTime && pointNumber != this->rootPointNumber)
-					{
-						cout << pointNumber << ' ';
-					}
-					if (pointUp < minUp)
-					{
-						minUp = pointUp;
-					}
-				}
-			}
-			int a = 1;
-		}
-		if (upIsSet)
-		{
-			up[pointNumber] = minUp;
-		}
-
-		if (!hasWhiteAdjacentPoints && points[pointNumber].color != Color::BLACK)
-		{
+			size_t pointNumber = stack.top();
 			stack.pop();
-			points[pointNumber].color = Color::BLACK;
+
+			if (points[pointNumber].color == Color::WHITE)
+			{
+				points[pointNumber].color = Color::GREY;
+				points[pointNumber].inTime = ++time;
+				up[pointNumber] = points[pointNumber].inTime;
+			}
+			if (points[pointNumber].color != Color::BLACK)
+			{
+				stack.push(pointNumber);
+			}
+
+			bool hasWhiteAdjacentPoints = false;
+			bool upIsSet = false;
+			size_t minUp = this->pointsCount * this->pointsCount;
+			for (size_t adjacentPointNumber : points[pointNumber].adjacentPoints)
+			{
+				if (points[adjacentPointNumber].color == Color::WHITE)
+				{
+					parent[adjacentPointNumber] = pointNumber;
+					stack.push(adjacentPointNumber);
+					hasWhiteAdjacentPoints = true;
+				}
+				else if (parent[pointNumber] != adjacentPointNumber)
+				{
+					if (points[adjacentPointNumber].color != Color::BLACK)
+					{
+						up[pointNumber] = Min<size_t>(up[pointNumber], up[adjacentPointNumber]);
+					}
+					else
+					{
+						upIsSet = true;
+						size_t pointUp = Min<size_t>(up[pointNumber], up[adjacentPointNumber]);
+						if (pointUp >= points[pointNumber].inTime && pointNumber != this->rootPointNumber)
+						{
+							this->points[pointNumber].isCutVeticle = true;
+						}
+						if (pointUp < minUp)
+						{
+							minUp = pointUp;
+						}
+					}
+				}
+				int a = 1;
+			}
+			if (upIsSet)
+			{
+				up[pointNumber] = minUp;
+			}
+
+			if (!hasWhiteAdjacentPoints && points[pointNumber].color != Color::BLACK)
+			{
+				stack.pop();
+				points[pointNumber].color = Color::BLACK;
+			}
+		}
+
+		for (size_t pointNumber : points[this->rootPointNumber].adjacentPoints)
+		{
+			if (up[pointNumber] != up[this->rootPointNumber])
+			{
+				++rootChildsCount;
+			}
+			if (rootChildsCount == 2)
+			{
+				cutVeticles[this->rootPointNumber] = true;
+				break;
+			}
 		}
 	}
 
-	for (size_t pointNumber : points[this->rootPointNumber].adjacentPoints)
+	vector<size_t> cutVeticles;
+	for (size_t i = 0; i < this->points.size(); ++i)
 	{
-		if (up[pointNumber] != up[this->rootPointNumber])
+		if (this->points[i].isCutVeticle)
 		{
-			++rootChildsCount;
+			cutVeticles.push_back(i);
 		}
-		if (rootChildsCount == 2)
+	}
+	return cutVeticles;
+}
+
+void Graph::PrintBridges()
+{
+	vector<size_t> cutVerticles = this->GetCutVerticles();
+	for (size_t cutVerticle : cutVerticles)
+	{
+		for (size_t adjacentPointNumber : this->points[cutVerticle].adjacentPoints)
 		{
-			cout << this->rootPointNumber;
-			return;
+			if (this->points[adjacentPointNumber].isCutVeticle ||
+				this->points[adjacentPointNumber].adjacentPoints.size() > 1)
+			{
+				cout << cutVerticle << " : " << adjacentPointNumber << '\n';
+			}
 		}
 	}
 }

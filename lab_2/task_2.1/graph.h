@@ -18,6 +18,7 @@ struct PointWithAdjacentPoints
 	size_t outTime;
 	Color color = WHITE;
 	AdjacentPoints adjacentPoints;
+	bool isCutVeticle = false;
 };
 
 using AdjacentyStruct = std::vector<PointWithAdjacentPoints>;
@@ -29,7 +30,8 @@ public:
 	void PrintPoints();
 	void BFS();
 	void DFS();
-	void PrintCutVeticles();
+	std::vector<size_t> GetCutVerticles();
+	void PrintBridges();
 	static bool IsParent(const PointWithAdjacentPoints& parent, const PointWithAdjacentPoints& child);
 
 private:
@@ -37,6 +39,7 @@ private:
 	size_t edgesCount;
 	size_t pointsCount;
 	size_t rootPointNumber;
+	bool cutVetirclesFound = false;
 
 	static const size_t inputLineParamsCount = 2;
 	static const size_t maxPointsCount = 400;
@@ -44,5 +47,4 @@ private:
 
 protected:
 	void Load(std::istream& in);
-
 };

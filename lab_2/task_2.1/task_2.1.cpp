@@ -1,5 +1,7 @@
 #include "pch.h"
+
 #include "graph.h"
+#include "vector_processor.h"
 using namespace std;
 
 int main(int argc, char* argv[])
@@ -10,12 +12,14 @@ int main(int argc, char* argv[])
 		{
 			ifstream file("input.txt");
 			Graph graph(file);
-			graph.PrintCutVeticles();
+			Print<size_t>(graph.GetCutVerticles());
+			graph.PrintBridges();
 		}
 		else
 		{
 			Graph graph(cin);
-			graph.PrintCutVeticles();
+			Print<size_t>(graph.GetCutVerticles());
+			graph.PrintBridges();
 		}
 		return 0;
 	}
